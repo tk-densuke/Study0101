@@ -1,5 +1,5 @@
 /* DEMANDのデータから有害事象情報を出力するプログラム */
-%let rootdir=X:\SUGI\2017\SPITS\code;
+%let rootdir=C:\Users\kawakami\Documents\SouceTree\Study0101;
 libname local 'C:\Densuke\Users\電助\Demand6\Client\Printout';
 filename tmplt "&rootdir.\root\template\template.xlsx" recfm=n;
 filename rslt "&rootdir.\root\output\result.xlsx" recfm=n;
