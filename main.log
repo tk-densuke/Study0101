@@ -1,0 +1,356 @@
+1                                                      SAS システム                     2017年 7月 5日 水曜日 17時34分07秒
+
+NOTE: Copyright (c) 2002-2012 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.4 (TS1M3 DBCS3170) 
+      Licensed to DENSUKE SYSTEMS CO., LTD., Site 10201506.
+NOTE: このセッションはX64_8PRO プラットフォーム上で実行されています。
+
+
+
+NOTE: Updated analytical products:
+      
+      SAS/STAT 14.1
+      SAS/ETS 14.1
+      SAS/OR 14.1
+      SAS/IML 14.1
+      SAS/QC 14.1
+
+NOTE: Additional host information:
+
+ X64_8PRO WIN 6.2.9200  Workstation
+
+NOTE: SASシステム初期化処理:
+      処理時間           0.18 秒
+      CPU時間            0.17 秒
+      
+NOTE: ファイル"C:\Users\kawakami\Documents\SouceTree\Study0101\main.sas"(ファイル参照名"#LN00005")のバイトオーダーマークが
+      示すデータのエンコーディングは"utf-8"です。このエンコーディングを使用して、ファイルを処理します。
+1          /* DEMANDのデータから有害事象情報を出力するプログラム */
+2          %let rootdir=C:\Users\kawakami\Documents\SouceTree\Study0101;
+3          libname local 'C:\Densuke\Users\電助\Demand6\Client\Printout';
+NOTE: ライブラリ参照名LOCALを次のように割り当てました。 
+      エンジン: V9 
+      物理名: C:\Densuke\Users\電助\Demand6\Client\Printout
+4          filename tmplt "&rootdir.\template\template.xlsx" recfm=n;
+5          filename rslt "&rootdir.\output\result.xlsx" recfm=n;
+6          
+7          
+8          
+9          %include "&rootdir.\sub01.sas" /source2;
+NOTE: %INCLUDE 
+      (レベル1)ファイルC:\Users\kawakami\Documents\SouceTree\Study0101\sub01.sasはファイルC:\Users\kawakami\Documents\Souc
+      eTree\Study0101\sub01.sasです。
+10        +/* 事前準備 */
+11        +
+12        +
+13        +/* DEMANDのデータを一括でローカルに持ってくるマクロ */
+14        +%Macro MEntry2Work(S_DIR,dmndid,out_dir,read,write,alter);
+15        +  options compress=yes;
+16        +
+17        +  libname DMND_DEF "&S_DIR.\Database\Study\&dmndid.\Definition" access=readonly;
+18        +  libname DMND_EN1 "&S_DIR.\Database\Study\&dmndid.\Entry1" access=readonly;
+19        +  libname _OUT "&out_dir.";
+20        +  data _null_;
+21        +    set DMND_DEF.C&DMNDID.CTL;
+22        +    call symput('DSID'||strip(put(_n_,best.)),DSID);
+23        +  run;
+24        +  data _null_;
+25        +    call symputx('CTLOBS',&sysnobs);
+26        +  run;
+27        +
+28        +  %do i=1 %to &CTLOBS.;
+29        +    %if %sysfunc(exist(DMND_EN1.C&DMNDID.&&DSID&i.)) %then %do;
+30        +      proc sort data=DMND_EN1.C&DMNDID.&&DSID&i.(read=&read)
+31        +                out=work.C&DMNDID.&&DSID&i.;
+32        +        by dsys_caseid dsys_repno1 dsys_repno2;
+33        +      run;
+34        +      data _OUT.C&DMNDID.&&DSID&i.(write=&write alter=&alter);
+35        +        set work.C&DMNDID.&&DSID&i.;
+2                                                      SAS システム                     2017年 7月 5日 水曜日 17時34分07秒
+
+36        +        by dsys_caseid dsys_repno1 dsys_repno2;
+37        +      run;
+38        +    %end;
+39        +  %end;
+40        +%Mend;
+41        +
+42        +/* フォーマット */
+43        +
+44        +proc format;
+45        +  value sevf
+46        +    1 = 軽度
+47        +    2 = 中等度
+48        +    3 = 重度
+49        +  ;
+NOTE: 出力形式SEVFを作成しました。
+50        +  value $detf
+51        +    '1' = 死亡
+52        +    '2' = 生存
+53        +    '3' = その他
+54        +    '4' = 不明
+55        +;
+NOTE: 出力形式$DETFを作成しました。
+56        +run;
+
+NOTE: PROCEDURE FORMAT処理(合計処理時間):
+      処理時間           0.01 秒
+      CPU時間            0.01 秒
+      
+
+NOTE: %INCLUDE (レベル1)を終了します。
+57         %MEntry2Work(V:\Demand6\Server
+58                     ,0101
+59                     ,C:\Temp
+60                     ,clearcut
+61                     ,pass01xx
+62                     ,pass02zz);
+NOTE: ライブラリ参照名DMND_DEFを次のように割り当てました。 
+      エンジン: V9 
+      物理名: V:\Demand6\Server\Database\Study\0101\Definition
+NOTE: ライブラリ参照名DMND_EN1を次のように割り当てました。 
+      エンジン: V9 
+      物理名: V:\Demand6\Server\Database\Study\0101\Entry1
+NOTE: ライブラリ参照名_OUTを次のように割り当てました。 
+      エンジン: V9 
+      物理名: C:\Temp
+
+NOTE: データセットDMND_DEF.C0101CTLから8オブザベーションを読み込みました。 
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.03 秒
+      CPU時間            0.03 秒
+      
+
+
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.00 秒
+      CPU時間            0.00 秒
+      
+
+
+NOTE: データセットDMND_EN1.C0101_00から12オブザベーションを読み込みました。 
+NOTE: データセットWORK.C0101_00は12オブザベーション、25変数です。
+NOTE: 圧縮によって、データセットWORK.C0101_00のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: PROCEDURE SORT処理(合計処理時間):
+      処理時間           0.10 秒
+      CPU時間            0.03 秒
+3                                                      SAS システム                     2017年 7月 5日 水曜日 17時34分07秒
+
+      
+
+
+NOTE: データセットWORK.C0101_00から12オブザベーションを読み込みました。 
+NOTE: データセット_OUT.C0101_00は12オブザベーション、25変数です。
+NOTE: 圧縮によって、データセット_OUT.C0101_00のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.01 秒
+      CPU時間            0.01 秒
+      
+
+
+NOTE: データセットDMND_EN1.C0101M01から24オブザベーションを読み込みました。 
+NOTE: データセットWORK.C0101M01は24オブザベーション、30変数です。
+NOTE: 圧縮によって、データセットWORK.C0101M01のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: PROCEDURE SORT処理(合計処理時間):
+      処理時間           0.05 秒
+      CPU時間            0.00 秒
+      
+
+
+NOTE: データセットWORK.C0101M01から24オブザベーションを読み込みました。 
+NOTE: データセット_OUT.C0101M01は24オブザベーション、30変数です。
+NOTE: 圧縮によって、データセット_OUT.C0101M01のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.01 秒
+      CPU時間            0.01 秒
+      
+
+
+NOTE: データセットDMND_EN1.C0101L01から240オブザベーションを読み込みました。 
+NOTE: データセットWORK.C0101L01は240オブザベーション、20変数です。
+NOTE: 圧縮によって、データセットWORK.C0101L01のサイズを0.00パーセント減少しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は2ページが必要です)
+NOTE: PROCEDURE SORT処理(合計処理時間):
+      処理時間           0.03 秒
+      CPU時間            0.00 秒
+      
+
+
+NOTE: データセットWORK.C0101L01から240オブザベーションを読み込みました。 
+NOTE: データセット_OUT.C0101L01は240オブザベーション、20変数です。
+NOTE: 圧縮によって、データセット_OUT.C0101L01のサイズを0.00パーセント減少しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は2ページが必要です)
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.01 秒
+      CPU時間            0.01 秒
+      
+
+
+NOTE: データセットDMND_EN1.C0101A01から12オブザベーションを読み込みました。 
+NOTE: データセットWORK.C0101A01は12オブザベーション、22変数です。
+NOTE: 圧縮によって、データセットWORK.C0101A01のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: PROCEDURE SORT処理(合計処理時間):
+      処理時間           0.05 秒
+      CPU時間            0.01 秒
+      
+
+
+NOTE: データセットWORK.C0101A01から12オブザベーションを読み込みました。 
+NOTE: データセット_OUT.C0101A01は12オブザベーション、22変数です。
+NOTE: 圧縮によって、データセット_OUT.C0101A01のサイズを100.00パーセント増加しました。 
+4                                                      SAS システム                     2017年 7月 5日 水曜日 17時34分07秒
+
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.00 秒
+      CPU時間            0.00 秒
+      
+
+
+NOTE: データセットDMND_EN1.C0101Y01から6オブザベーションを読み込みました。 
+NOTE: データセットWORK.C0101Y01は6オブザベーション、31変数です。
+NOTE: 圧縮によって、データセットWORK.C0101Y01のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: PROCEDURE SORT処理(合計処理時間):
+      処理時間           0.06 秒
+      CPU時間            0.00 秒
+      
+
+
+NOTE: データセットWORK.C0101Y01から6オブザベーションを読み込みました。 
+NOTE: データセット_OUT.C0101Y01は6オブザベーション、31変数です。
+NOTE: 圧縮によって、データセット_OUT.C0101Y01のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.00 秒
+      CPU時間            0.00 秒
+      
+
+
+NOTE: データセットDMND_EN1.C0101M02から18オブザベーションを読み込みました。 
+NOTE: データセットWORK.C0101M02は18オブザベーション、43変数です。
+NOTE: 圧縮によって、データセットWORK.C0101M02のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: PROCEDURE SORT処理(合計処理時間):
+      処理時間           0.06 秒
+      CPU時間            0.01 秒
+      
+
+
+NOTE: データセットWORK.C0101M02から18オブザベーションを読み込みました。 
+NOTE: データセット_OUT.C0101M02は18オブザベーション、43変数です。
+NOTE: 圧縮によって、データセット_OUT.C0101M02のサイズを100.00パーセント増加しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は1ページが必要です)
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.00 秒
+      CPU時間            0.00 秒
+      
+
+
+NOTE: データセットDMND_EN1.C0101L02から420オブザベーションを読み込みました。 
+NOTE: データセットWORK.C0101L02は420オブザベーション、20変数です。
+NOTE: 圧縮によって、データセットWORK.C0101L02のサイズを33.33パーセント減少しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は3ページが必要です)
+NOTE: PROCEDURE SORT処理(合計処理時間):
+      処理時間           0.06 秒
+      CPU時間            0.01 秒
+      
+
+
+NOTE: データセットWORK.C0101L02から420オブザベーションを読み込みました。 
+NOTE: データセット_OUT.C0101L02は420オブザベーション、20変数です。
+NOTE: 圧縮によって、データセット_OUT.C0101L02のサイズを33.33パーセント減少しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は3ページが必要です)
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.00 秒
+      CPU時間            0.00 秒
+      
+
+5                                                      SAS システム                     2017年 7月 5日 水曜日 17時34分07秒
+
+
+NOTE: データセットDMND_EN1.C0101L03から240オブザベーションを読み込みました。 
+NOTE: データセットWORK.C0101L03は240オブザベーション、20変数です。
+NOTE: 圧縮によって、データセットWORK.C0101L03のサイズを0.00パーセント減少しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は2ページが必要です)
+NOTE: PROCEDURE SORT処理(合計処理時間):
+      処理時間           0.03 秒
+      CPU時間            0.01 秒
+      
+
+
+NOTE: データセットWORK.C0101L03から240オブザベーションを読み込みました。 
+NOTE: データセット_OUT.C0101L03は240オブザベーション、20変数です。
+NOTE: 圧縮によって、データセット_OUT.C0101L03のサイズを0.00パーセント減少しました。 
+      圧縮時のサイズは2ページです。(非圧縮時は2ページが必要です)
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.00 秒
+      CPU時間            0.00 秒
+      
+
+63         
+64         
+65         %include "&rootdir.\sub03.sas" /source2;
+NOTE: %INCLUDE 
+      (レベル1)ファイルC:\Users\kawakami\Documents\SouceTree\Study0101\sub03.sasはファイルC:\Users\kawakami\Documents\Souc
+      eTree\Study0101\sub03.sasです。
+66        +/* Excelに出力するプログラム */
+67        +
+68        +data _null_;
+69        +  rc=fcopy('tmplt','rslt');
+70        +  put rc=;
+71        +run;
+
+rc=0
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.01 秒
+      CPU時間            0.01 秒
+      
+
+72        +options noxwait noxsync;
+73        +x 'X:\SUGI\2017\SPITS\code\root\output\result.xlsx'
+73       !+                                                   ;
+74        +data _NULL_;
+75        +  rc = sleep(1);
+76        +run;
+
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           1.00 秒
+      CPU時間            0.00 秒
+      
+
+77        +
+78        +filename xlsout DDE "EXCEL|[result.xlsx]Sheet1!R4C2:R100C6" notab;
+79        +data _null_;
+80        +  set sevdeath;
+ERROR: ファイルWORK.SEVDEATH.DATAは存在しません。
+81        +  file xlsout; /*データ書き込み*/
+82        +  tab='09'x;
+83        +  put AESEVN tab AESDTH  tab COUNT tab PERCENT;
+84        +run;
+
+NOTE: エラーが発生したため、このステップの処理を中止しました。
+NOTE: DATAステートメント処理(合計処理時間):
+      処理時間           0.00 秒
+      CPU時間            0.00 秒
+      
+6                                                      SAS システム                     2017年 7月 5日 水曜日 17時34分07秒
+
+
+85        +
+86        +filename xlsout clear;
+NOTE: ファイル参照名XLSOUTの割り当てを取り消しました。
+NOTE: %INCLUDE (レベル1)を終了します。
+87         
+
+ERROR: エラーをプリントしました:ページ5.
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: SAS システム処理:
+      処理時間           3.82 秒
+      CPU時間            0.57 秒
+      
