@@ -1,6 +1,6 @@
-/* DEMAND‚Ìƒf[ƒ^‚©‚ç—LŠQ–Ûî•ñ‚ğo—Í‚·‚éƒvƒƒOƒ‰ƒ€ */
+ï»¿/* DEMANDã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰æœ‰å®³äº‹è±¡æƒ…å ±ã‚’å‡ºåŠ›ã™ã‚‹ãƒ—ãƒ­ã‚°ãƒ©ãƒ  */
 %let rootdir=C:\Users\kawakami\Documents\SouceTree\Study0101;
-libname local 'C:\Densuke\Users\“d•\Demand6\Client\Printout';
+libname local 'C:\Densuke\Users\é›»åŠ©\Demand6\Client\Printout';
 filename tmplt "&rootdir.\template\template.xlsx" recfm=n;
 filename rslt "&rootdir.\output\result.xlsx" recfm=n;
 
