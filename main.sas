@@ -6,7 +6,7 @@ filename rslt "&rootdir.\output\result.xlsx" recfm=n;
 
 
 
-%include "&rootdir.\sub01.sas";
+%include "&rootdir.\sub01.sas" /source2;
 %MEntry2Work(V:\Demand6\Server
             ,0101
             ,C:\Temp
