@@ -15,5 +15,6 @@ filename rslt "&rootdir.\output\result.xlsx" recfm=n;
             ,pass02zz);
 
 
+%include "&rootdir.\sub02.sas" /source2;
 %include "&rootdir.\sub03.sas" /source2;
     

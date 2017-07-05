@@ -5,7 +5,7 @@ data _null_;
   put rc=;
 run;
 options noxwait noxsync;
-x 'X:\SUGI\2017\SPITS\code\root\output\result.xlsx';
+x "&rootdir.\output\result.xlsx";
 data _NULL_;
   rc = sleep(1);
 run;
